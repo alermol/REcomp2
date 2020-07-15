@@ -9,12 +9,15 @@ from sqlalchemy import create_engine
 from yattag import Doc, indent
 
 
+#TODO Add run parameters and thersholds in report
 class HtmlReportGenerator:
     def __init__(self,
                  path_to_report_table,
-                 path_to_output_html):
+                 path_to_output_html,
+                 args):
         self.path_to_report_table = path_to_report_table
         self.path_to_output_html = path_to_output_html
+        self.args = args
         self.LOGGER = logging.getLogger(__name__)
         self.LOGGER.setLevel(logging.DEBUG)
 
@@ -36,6 +39,25 @@ class HtmlReportGenerator:
         with open(self.path_to_output_html, "w") as output:
             output.write(result)
 
+        # run parameters
+        with tag("h2", klass="run-parameters"):
+            text("Run parameters and thresholds:")
+            with tag("h4", klass="thresholds"):
+                text(f"E-value threshold: {self.args.evalue}")
+                doc.stag("br")
+                text(f"Identity percent threshold: {self.args.identity_percent}")
+                doc.stag("br")
+                text(f"Query cover threshold: {self.args.query_cover}")
+                doc.stag("br")
+                text(f"Include ribosomal clusters: {self.args.include_ribosomal}")
+                doc.stag("br")
+                text(f"Exclude 'Other' clusters: {self.args.exclude_other}")
+                doc.stag("br")
+        result = indent(doc.getvalue())
+        with open(self.path_to_output_html, "w") as output:
+            output.write(result)
+
+
         # Identified superclusters
         with tag("h2", klass="identified-header"):
             text("Identified superclusters")
@@ -45,8 +67,11 @@ class HtmlReportGenerator:
         all_identified = list(itertools.chain(*all_identified))
         all_identified = natsorted(list(np.unique(all_identified)))
         for scl in all_identified:
+            scl_name = re.search(r"[a-z]+", scl).group(0).capitalize()
+            scl_num = re.search(r"\d+", scl).group(0)
+            scl_name = f"{scl_name} {scl_num}"
             with tag("h3", klass="supercluster-name"):
-                text(scl)
+                text(scl_name)
             # get path to fasta
             path_to_fasta = engine.execute(f"SELECT Path_to_fasta \
                 FROM report_table \
@@ -197,8 +222,11 @@ class HtmlReportGenerator:
         not_identified = list(itertools.chain(*not_identified))
         not_identified = natsorted(list(np.unique(not_identified)))
         for scl in not_identified:
+            scl_name = re.search(r"[a-z]+", scl).group(0).capitalize()
+            scl_num = re.search(r"\d+", scl).group(0)
+            scl_name = f"{scl_name} {scl_num}"
             with tag("h3", klass="supercluster-name"):
-                text(scl)
+                text(scl_name)
             # get path to fasta
             path_to_fasta = engine.execute(f"SELECT Path_to_fasta \
                 FROM report_table \
@@ -314,8 +342,11 @@ class HtmlReportGenerator:
         probable_unique = list(itertools.chain(*probable_unique))
         probable_unique = natsorted(list(np.unique(probable_unique)))
         for scl in probable_unique:
+            scl_name = re.search(r"[a-z]+", scl).group(0).capitalize()
+            scl_num = re.search(r"\d+", scl).group(0)
+            scl_name = f"{scl_name} {scl_num}"
             with tag("h3", klass="supercluster-name"):
-                text(scl)
+                text(scl_name)
             # get path to fasta
             path_to_fasta = engine.execute(f"SELECT Path_to_fasta \
                 FROM report_table \
@@ -430,16 +461,6 @@ class HtmlReportGenerator:
                     AND Features=='Truly unique'").fetchall()
         truly_unique = list(itertools.chain(*truly_unique))
         truly_unique = natsorted(list(np.unique(truly_unique)))
-        # for scl in truly_unique:
-        #     with tag("h3", klass="supercluster-name"):
-        #         text(scl)
-            # get path to fasta
-        # path_to_fasta = engine.execute(f"SELECT Path_to_fasta \
-        #     FROM report_table \
-        #         WHERE SuperclusterType=='probable_unique' \
-        #             AND SuperclusterName=='{scl}'").fetchone()[0]
-        # with tag("a", download="Supercluster fasta", href=path_to_fasta):
-        #     text("Supercluster fasta")
         with tag("table", klass="probable-unique-table"):
             # table header
             with tag("tr"):

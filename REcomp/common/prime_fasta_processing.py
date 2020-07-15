@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 from pathlib import Path
 
 import pandas as pd
@@ -29,7 +30,13 @@ class FastaFinalizer:
                     SeqIO.write(record, ffasta, "fasta")
                 else:
                     continue
+        if len(require_pref) == 0:
+            return
         tmp_id = self.__tmp_other_id(require_pref, other_id)
+        # prime_list = [path for path in self.path_to_prime.rglob("*.fasta")]
+        # for pfasta in prime_list:
+        #     dest = pfasta.parent.joinpath(f"{pfasta.stem}_tmp.fasta")
+        #     shutil.copyfile(pfasta, dest)
         with open(self.path_to_prime.joinpath(f"{path_to_fasta.stem}_tmp.fasta"),
                   "w") as tmp, open(self.path_to_prime.joinpath(path_to_fasta.name)) as src:
             for record in SeqIO.parse(src, "fasta"):
@@ -54,11 +61,11 @@ class FastaFinalizer:
             open(self.path_to_prime.joinpath(f"{path_to_fasta.stem}_tmp.fasta")) as tmp:
                 for record in SeqIO.parse(tmp, "fasta"):
                     if record.id == b_tab_bit:
-                        record.id = f"{record.id}_maxBitscore.fasta"
+                        record.id = f"{record.id}_maxBitscore"
                         record.description = ""
                         SeqIO.write(record, ffasta, "fasta")
                     elif record.id == b_tab_evalue:
-                        record.id = f"{record.id}_minEvalue.fasta"
+                        record.id = f"{record.id}_minEvalue"
                         record.description = ""
                         SeqIO.write(record, ffasta, "fasta")
                     else:

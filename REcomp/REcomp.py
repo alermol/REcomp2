@@ -3,6 +3,7 @@
 
 
 import argparse
+import itertools
 import logging
 import os
 import re
@@ -21,6 +22,8 @@ from common.align_fasta import FastaAligner
 from common.prepare_fasta import PrepFasta as pf
 from common.prime_fasta import PrimeFastaWriter
 from common.prime_fasta_processing import FastaFinalizer
+from report.report_generator import HtmlReportGenerator
+from report.summary_table import ReportTableConstructor
 
 # TODO
 # [] make proper help
@@ -50,6 +53,23 @@ parser.add_argument("-ir", "--include-ribosomal",
                     action="store_false",
                     help="include rDNA clusters (rank 4) in analysis (default: False)",
                     dest="include_ribosomal")
+parser.add_argument("--evalue",
+                    help="evalue threshold for alignments for supercluster assembly (default: 1e-05)",
+                    default=1e-05,
+                    type=float,
+                    choices=["float value >=0.0"])
+parser.add_argument("--ident",
+                    help="identity percent threshold for alignment for superclusters assembly (default: 90.0)",
+                    default=90.0,
+                    type=float,
+                    dest="identity_percent",
+                    choices=["float range 0.0..100.0"])
+parser.add_argument("--qcov",
+                    help="query cover threshold for alignment for superclusters assembly (default: 80.0)",
+                    default=80.0,
+                    type=float,
+                    dest="query_cover",
+                    choices=["float range 0.0..100.0"])
 args = parser.parse_args()
 
 # create folder structure
@@ -117,11 +137,14 @@ for i, batch in enumerate(fasta_prep.batch_iterator(record_iter, 1000)):
     print(f"Wrote {count} records to {filename.name}")
 
 # prepare connectivity table
-fasta_aligner = FastaAligner(fasta_path.joinpath("fasta.fasta"))
+fasta_aligner = FastaAligner(args.evalue,
+                             args.identity_percent,
+                             args.query_cover)
 files = [path for path in fasta_path.rglob("*.fasta")
          if any(map(str.isdigit, Path(path).stem))]
+pairs = [list(i) for i in itertools.combinations_with_replacement(files, 2)]
 pool = Pool(processes=args.cpu_number)
-result = pool.map(fasta_aligner.align_fasta, files)
+result = pool.map(fasta_aligner.align_fasta, pairs)
 blast_table = pd.concat(result)
 pool.close()
 blast_table = blast_table[blast_table["qseqid"] != blast_table["sseqid"]]
@@ -169,26 +192,25 @@ pool.close()
 shutil.rmtree(prime_fasta)
 
 
-# # report generation
-# # create database from all tarean_reports
-# db_constructor = rtc()
-# clusters_table = pd.DataFrame()
-# for path, prefix in work_dirs.items():
-#     repex_path = path + "/cluster_report.html"
-#     table = db_constructor.process_cluster_data(prefix,
-#                                                 repex_path,
-#                                                 str(args.out) + "/report_src/graph_layouts/" + prefix)
-#     clusters_table = clusters_table.append(table, ignore_index=True)
-# recomp_results_table = db_constructor.recomp_results_database_construct(str(fasta_path_id),
-#                                                                         str(fasta_path_not_id),
-#                                                                         str(unique_prob_scl),
-#                                                                         str(ref_superclusters),
-#                                                                         args.known)
-# report_table = db_constructor.recomp_report_table_generation(recomp_results_table, clusters_table)
-# report_table.to_csv(str(Path(report_src).parent.parent) + "/superclusters_table.csv",
-#                     index=False)
-# report_generator = hrg(str(Path(report_src).parent.parent) + "/superclusters_table.csv",
-#                        str(out_path) + "/report.html")
-# report_generator.generate_report()
-# shutil.copyfile("report/style1.css", str(out_path) + "/style1.css")
-# logging.info("DONE")
+# report generation
+# create database from all tarean_reports
+db_constructor = ReportTableConstructor()
+clusters_table = pd.DataFrame()
+for path, prefix in work_dirs.items():
+    repex_path = Path(path).joinpath("cluster_report.html")
+    table = db_constructor.process_cluster_data(prefix,
+                                                repex_path,
+                                                out_path.joinpath("report", "graph_layouts", prefix))
+    clusters_table = clusters_table.append(table, ignore_index=True)
+recomp_results_table = db_constructor.recomp_results_database_construct(final_fasta,
+                                                                        args.known)
+report_table = db_constructor.recomp_report_table_generation(recomp_results_table, clusters_table)
+report_table.to_csv(out_path.joinpath("report", "superclusters_table.csv"),
+                    index=False)
+report_generator = HtmlReportGenerator(out_path.joinpath("report", "superclusters_table.csv"),
+                                       out_path.joinpath("report.html"),
+                                       args)
+report_generator.generate_report()
+shutil.copyfile(Path.cwd().joinpath("REcomp", "report", "style1.css"),
+                out_path.joinpath("style1.css"))
+logging.info("DONE")

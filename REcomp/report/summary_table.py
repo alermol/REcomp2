@@ -82,11 +82,28 @@ class ReportTableConstructor:
                                                       "TAREAN_annotation": str})
         return cluster_dataframe
 
+
+    def __define_scl_type(self,
+                          path_to_fasta,
+                          path_to_references):
+        """
+        Function define type of supercluster in fasta file
+        """
+        references = set(SeqIO.to_dict(SeqIO.parse(path_to_references,
+                                                   "fasta")).keys())
+        fasta_id = set(list(SeqIO.to_dict(SeqIO.parse(path_to_fasta,
+                                                       "fasta")).keys()))
+        if len(fasta_id.intersection(references)) >= 1:
+            return "identified"
+        else:
+            if (len(fasta_id.intersection(references)) == 0 and
+                sum([True if "_TR_1_x_" in i else False for i in fasta_id]) > 1):
+                return "not_identified"
+        return "probable_unique"
+
+
     def recomp_results_database_construct(self,
-                                          path_to_identified,
-                                          path_to_not_identified,
-                                          path_to_probable,
-                                          path_to_refscl,
+                                          path_to_fasta,
                                           path_to_references):
         """
         Function does compile table with data about each superclusters from
@@ -94,48 +111,38 @@ class ReportTableConstructor:
         """
         references_id = list(SeqIO.to_dict(SeqIO.parse(path_to_references,
                                                        "fasta")).keys())
-        paths = [path_to_identified, path_to_not_identified,
-                 path_to_probable, path_to_refscl]
+        paths = [path for path in path_to_fasta.rglob("*.fasta")
+                 if any(map(str.isdigit, Path(path).name))]
         recomp_results_table = pd.DataFrame()
-        for path in paths:
-            for file in Path(path).glob("*.fasta"):
-                scl_records = list(SeqIO.to_dict(SeqIO.parse(file, "fasta")).values())
-                records_id = [scl_id.id for scl_id in scl_records]
-                records_seq = [scl_seq.seq for scl_seq in scl_records]
-                records_source = ["reference" if record in references_id else
-                                  "REother_contig" if "Contig" in record and
-                                  "refscl" not in record else
-                                  "REreference_scl" if "refscl" in record else
-                                  "REconsensus" for record in records_id]
-                scl_name = [file.stem for _ in range(len(records_id))]
-                uniqueness = ["Truly unique" if len(scl_records) == 1 else ""
-                              for _ in range(len(scl_records))]
-                path_to_fasta = [re.search(r"[a-z\_]+\/[a-z\_]+\/[a-z0-9\_]+\.[a-z\_]+$", str(file)).group(0)
-                                 for _ in range(len(records_id))]
-                if path == path_to_identified:
-                    cluster_type = ["identified" for _ in range(len(scl_name))]
-                if path == path_to_not_identified:
-                    cluster_type = ["not_identified" for _ in range(len(scl_name))]
-                if path == path_to_probable:
-                    cluster_type = ["probable_unique" for _ in range(len(scl_name))]
-                if path == path_to_refscl:
-                    cluster_type = ["reference_scl" for _ in range(len(scl_name))]
-                dataframe = pd.DataFrame({"RecordID": records_id,
-                                          "RecordSeq": records_seq,
-                                          "ClusterName": scl_name,
-                                          "ClusterType": cluster_type,
-                                          "RecordSource": records_source,
-                                          "Path_to_fasta": path_to_fasta,
-                                          "Uniqueness": uniqueness})
-                dataframe = dataframe.astype({"RecordID": str,
-                                              "RecordSeq": str,
-                                              "ClusterName": str,
-                                              "ClusterType": str,
-                                              "RecordSource": str,
-                                              "Path_to_fasta": str,
-                                              "Uniqueness": str})
-                recomp_results_table = recomp_results_table.append(dataframe,
-                                                                   ignore_index=True)
+        for file in paths:
+            scl_records = list(SeqIO.to_dict(SeqIO.parse(file, "fasta")).values())
+            records_id = [scl_id.id for scl_id in scl_records]
+            records_seq = [scl_seq.seq for scl_seq in scl_records]
+            records_source = ["reference" if record in references_id else
+                              "REother_contig" if "Contig" in record else
+                              "REconsensus" for record in records_id]
+            scl_name = [file.stem] * len(scl_records)
+            uniqueness = ["Truly unique" if len(scl_records) == 1 else ""
+                            for _ in range(len(scl_records))]
+            path_to_fasta = [re.search("[a-z\_]+\/[a-z\_]+\/[a-z0-9\_]+\.[a-z\_]+$", str(file)).group(0)
+                                for _ in range(len(records_id))]
+            cluster_type = [self.__define_scl_type(file, path_to_references)] * len(scl_name)
+            dataframe = pd.DataFrame({"RecordID": records_id,
+                                        "RecordSeq": records_seq,
+                                        "ClusterName": scl_name,
+                                        "ClusterType": cluster_type,
+                                        "RecordSource": records_source,
+                                        "Path_to_fasta": path_to_fasta,
+                                        "Uniqueness": uniqueness})
+            dataframe = dataframe.astype({"RecordID": str,
+                                            "RecordSeq": str,
+                                            "ClusterName": str,
+                                            "ClusterType": str,
+                                            "RecordSource": str,
+                                            "Path_to_fasta": str,
+                                            "Uniqueness": str})
+            recomp_results_table = recomp_results_table.append(dataframe,
+                                                                ignore_index=True)
         return recomp_results_table
 
 
@@ -196,48 +203,11 @@ class ReportTableConstructor:
                                       "Features": [row[6]],
                                       "Path_to_fasta": [row[5]]})
                 report_table = report_table.append(table, ignore_index=True)
-            elif row[4] == "REreference_scl":
-                prefix = re.search(r"^[a-zA-Z0-9]+", row[0]).group(0)
-                cluster = re.search(r"[0-9]+",
-                                    row[0].split("_")[1].split("Contig")[0]).group(0)
-                record_id = "_".join(row[0].split("_")[0:2])
-                feature = row[0].split("_")[-2]
-                proportion = engine.execute(f"SELECT Proportion \
-                    FROM repex_table \
-                        WHERE Prefix='{prefix}' \
-                            AND Cluster='{cluster}'").fetchall()
-                number_of_reads = engine.execute(f"SELECT Number_of_reads \
-                    FROM repex_table \
-                        WHERE Prefix='{prefix}' \
-                            AND Cluster='{cluster}'").fetchall()
-                grapth_layout = engine.execute(f"SELECT Graph_layout \
-                    FROM repex_table \
-                        WHERE Prefix='{prefix}' \
-                            AND Cluster='{cluster}'").fetchall()
-                tarean_annotation = engine.execute(f"SELECT TAREAN_annotation \
-                    FROM repex_table \
-                        WHERE Prefix='{prefix}' \
-                            AND Cluster='{cluster}'").fetchall()
-                table = pd.DataFrame({"Prefix": [prefix],
-                                      "Cluster": [cluster],
-                                      "Proportion": [proportion[0][0]],
-                                      "Number_of_reads": [number_of_reads[0][0]],
-                                      "Graph_layout": [grapth_layout[0][0]],
-                                      "TAREAN_annotation": [tarean_annotation[0][0]],
-                                      "RecordID": [record_id],
-                                      "RecordSeq": [row[1]],
-                                      "SuperclusterName": [row[2]],
-                                      "SuperclusterType": [row[3]],
-                                      "RecordSource": [row[4]],
-                                      "Features": [feature],
-                                      "Path_to_fasta": [row[5]]})
-                report_table = report_table.append(table, ignore_index=True)
             else:
                 prefix = re.search(r"^[a-zA-Z0-9]+", row[0]).group(0)
                 cluster = re.search(r"[0-9]+",
                                     row[0].split("_")[1].split("Contig")[0]).group(0)
-                record_id = re.search(r"^[a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9]+bp",
-                                      row[0]).group(0)
+                record_id = re.search(r"^[a-zA-Z0-9]+_[a-zA-Z0-9]+", row[0]).group(0)
                 feature = row[0].split("_")[-1]
                 proportion = engine.execute(f"SELECT Proportion \
                     FROM repex_table \
