@@ -37,7 +37,7 @@ parser.add_argument("-v", "--version",
 parser.add_argument("i", help="path(s) to RE results (top level)",
                     type=str,
                     metavar="path")
-parser.add_argument("p", help="prefix(es) for fasta filename",
+parser.add_argument("p", help="prefix(es) for each paths",
                     type=str,
                     metavar="prefix")
 parser.add_argument("out", help="path to output directory")

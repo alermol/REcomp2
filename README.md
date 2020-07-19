@@ -33,7 +33,7 @@ The help message and available options can be accessed using
 
 ```bash
 ./REcomp.py -h # short option
-./REcomp.py -h # long option
+./REcomp.py --help # long option
 ```
 
 which gives the following output
@@ -45,7 +45,7 @@ usage: REcomp.py [-h] [-v] [-r REF] [-l] [-c CPU] [-io] [-ir]
 
 positional arguments:
   path                  path(s) to RE results (top level)
-  prefix                prefix(es) for fasta filename
+  prefix                prefix(es) for each paths
   out                   path to output directory
 
 optional arguments:
@@ -70,19 +70,23 @@ The details of each option are given below:
 
 ### `path`
 
-**Expects**: STRING  
-**Default**: None  
+**Expects**: *STRING*  
+**Default**: *None*  
 The input for this argument is string in quotes that contains space separated paths to top level of RepeatExplorer results. Paths must not be repeated. This argument is required.  
 **Example**  
 ```"~/RE_result1 ~/RE_result2"```
 
 ### `prefix`
 
-**Expects**: STRING  
-**Default**: None  
+**Expects**: *STRING*  
+**Default**: *None*  
 This argument take in a string in quotes that contains space seaparted prefixes for each paths in `path` argument. Each one prefix must be matching only one path. Prefixes must not be repeated. Short prefixes are recomended. This argument is requered.  
 **Example**  
 ```"p1 p2"```
 
 ### `out`
-
+**Expect**: *STRING (to be used as a path to directory)*  
+**Default**: *None*  
+This is the last required argument for REcomp2. Points to directory for results saving. If directory does not exist, it will be created.  
+**Example**  
+```"~/REcomp_result"```
