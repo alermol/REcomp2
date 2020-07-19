@@ -38,7 +38,7 @@ The help message and available options can be accessed using
 
 which gives the following output
 
-```
+```None
 usage: REcomp.py [-h] [-v] [-r REF] [-l] [-c CPU] [-io] [-ir]
                  [--evalue EVALUE] [--ident IDENTITY_PERC]
                  [--qcov QUERY_COVER] [--low-memory] path prefix out
@@ -147,3 +147,12 @@ If this parameters in set, fasta file will be splitted in chunk with less size. 
 ### `-v or --version`
 
 Prints the version info of REcomp2
+
+## Examples
+
+### Basic usage
+
+```bash
+# find all superclusters
+./REcomp.py ''
+```
