@@ -30,7 +30,7 @@ class PrepFasta:
         rank_files = [self.RANK1, self.RANK2, self.RANK3, self.RANK4]
         known_cl = []
         for rank_file in rank_files:
-            rank_fasta_path = self.path_to_results + rank_file
+            rank_fasta_path = self.path_to_results + "/" + rank_file
             rank_fasta = SeqIO.to_dict(SeqIO.parse(rank_fasta_path, "fasta"))
             for cl in list(rank_fasta.keys()):
                 cl_part = re.search(r"CL\d{1,}", cl).group(0)
@@ -55,8 +55,8 @@ class PrepFasta:
 
 
     def create_united_fasta(self, path_to_output,
-                            exclude_other=True, include_ribosomal=False):
-        if not include_ribosomal:
+                            include_other=False, include_ribosomal=False):
+        if include_ribosomal:
             ranks_files = [self.RANK1, self.RANK2, self.RANK3, self.RANK4]
         else:
             ranks_files = [self.RANK1, self.RANK2, self.RANK3]
@@ -70,7 +70,7 @@ class PrepFasta:
                         consensus.description = ""
                         SeqIO.write(consensus, out, "fasta")
             # other
-            if not exclude_other:
+            if include_other:
                 other_dirs = self.__get_other_dir()
                 path = Path(self.path_to_results).joinpath("seqclust", "clustering", "clusters")
                 for file in other_dirs:

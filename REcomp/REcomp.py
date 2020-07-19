@@ -17,7 +17,6 @@ import numpy as np
 import pandas as pd
 from Bio import SeqIO
 from python_algorithms.basic.union_find import UF
-from Bio.Blast.Applications import NcbimakeblastdbCommandline
 
 import config
 from common.align_fasta import FastaAligner
@@ -28,8 +27,6 @@ from common.prime_fasta_processing import FastaFinalizer
 from report.report_generator import HtmlReportGenerator
 from report.summary_table import ReportTableConstructor
 
-# TODO
-# [] make proper help
 
 parser = argparse.ArgumentParser(description="REcomp2",
                                  epilog="Please report about all bugs")
@@ -53,12 +50,12 @@ parser.add_argument("-l", help="save logfile in output directory",
 parser.add_argument("-c", help="number of CPU to use",
                     type=int, default=cpu_count(),
                     dest="cpu_number", metavar="CPU")
-parser.add_argument("-eo", "--exclude-other",
-                    help=("exclude all 'other' contigs and clusters from \
-                        analysis (default: True)"),
-                    action="store_true", dest="exclude_other")
+parser.add_argument("-io", "--include-other",
+                    help=(("include 'other' contigs and clusters "
+                           "in analysis (default: False)")),
+                    action="store_true", dest="include_other")
 parser.add_argument("-ir", "--include-ribosomal",
-                    action="store_false",
+                    action="store_true",
                     help="include rDNA clusters (rank 4) in analysis (default: False)",
                     dest="include_ribosomal")
 parser.add_argument("--evalue",
@@ -119,6 +116,7 @@ logging.info(args)
 
 # check input
 check_input = CheckInput()
+check_input.check_blast(os.environ["PATH"])
 if args.references is not None:
     check_input.check_references(args.references)
 work_dirs = {path:prefix for path, prefix in zip(args.i.split(), args.p.split())}
@@ -148,7 +146,7 @@ logging.info("creating fasta containing all sequences for analysis")
 for path, prefix in work_dirs.items():
     fasta_prep = pf(path, args.references, prefix)
     fasta_prep.create_united_fasta(fasta_path,
-                                   exclude_other=args.exclude_other,
+                                   include_other=args.include_other,
                                    include_ribosomal=args.include_ribosomal)
 if args.references:
     with open(Path(fasta_path).joinpath("fasta.fasta"), "a") as fasta:
@@ -264,6 +262,6 @@ report_generator = HtmlReportGenerator(out_path.joinpath("report",
                                        out_path.joinpath("report.html"),
                                        args)
 report_generator.generate_report()
-shutil.copyfile(Path.cwd().joinpath("REcomp", "report", "style1.css"),
+shutil.copyfile(Path.cwd().joinpath("report", "style1.css"),
                 out_path.joinpath("style1.css"))
 logging.info("DONE")

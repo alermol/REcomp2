@@ -50,7 +50,7 @@ class HtmlReportGenerator:
                 doc.stag("br")
                 text(f"Include ribosomal clusters: {self.args.include_ribosomal}")
                 doc.stag("br")
-                text(f"Exclude 'Other' clusters: {self.args.exclude_other}")
+                text(f"Include 'Other' clusters: {self.args.include_other}")
                 doc.stag("br")
         result = indent(doc.getvalue())
         with open(self.path_to_output_html, "w") as output:

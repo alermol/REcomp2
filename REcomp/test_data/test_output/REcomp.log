@@ -1,0 +1,69 @@
+
+2020-07-19 23:55:33,572 - <module> - INFO -
+
+------------------------------------------------------------------
+PIPELINE VERSION               :           2.0.0
+
+AUTHOR                         :      Aleksey Ermolaev
+------------------------------------------------------------------
+             
+
+
+2020-07-19 23:55:33,572 - <module> - INFO -
+Namespace(cpu_number=4, evalue=1e-05, i='test_data/S1 test_data/S2', identity_percent=90.0, include_other=False, include_ribosomal=False, log=True, low_memory=False, out='test_data/test_output', p='S1 S2', query_cover=80.0, references='test_data/test_references.fasta')
+
+
+2020-07-19 23:55:33,606 - <module> - INFO -
+Pipeline will be in progress in 30 sec
+Check matching of paths to RE results and their prefixes
++--------------+--------+
+|     Path     | Prefix |
++--------------+--------+
+| test_data/S1 |   S1   |
+| test_data/S2 |   S2   |
++--------------+--------+
+
+
+2020-07-19 23:56:03,612 - <module> - INFO -
+creating directory structure
+
+
+2020-07-19 23:56:03,613 - <module> - INFO -
+creating fasta containing all sequences for analysis
+
+
+2020-07-19 23:56:03,630 - <module> - INFO -
+chunk size: 10000
+
+
+2020-07-19 23:56:08,642 - <module> - INFO -
+saving chunk test_output/fasta/fasta0.fasta
+
+
+2020-07-19 23:56:08,642 - <module> - INFO -
+running all to all blast
+
+
+2020-07-19 23:56:13,878 - <module> - INFO -
+all to all blast finished
+
+
+2020-07-19 23:56:13,925 - <module> - INFO -
+70 superclusters detected
+
+
+2020-07-19 23:56:18,931 - <module> - INFO -
+prepare primary fasta
+
+
+2020-07-19 23:56:24,024 - <module> - INFO -
+cleaning the primary fasta files from excessive 'other' clusters
+
+
+2020-07-19 23:56:29,638 - generate_report - INFO -
+report generation
+
+
+2020-07-19 23:56:29,727 - <module> - INFO -
+DONE
+

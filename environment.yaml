@@ -1,7 +1,7 @@
-name: recomp2
-chanells:
-  - conda
+name: recomp
+channels:
   - pypi
+  - conda-forge
 dependencies:
   - python 3.8.*
   - bs4
@@ -10,7 +10,7 @@ dependencies:
   - natsort
   - numpy
   - pandas
-  - prettytable
-  - python-algoriths
+  - PrettyTable
+  - pip
   - sqlalchemy
   - yattag
