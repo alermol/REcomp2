@@ -136,7 +136,7 @@ Identity percent thershold for BLAST alignment. Alignments with identity percent
 
 **Expects**: *0.0 <= FLOAT <= 100.0*  
 **Default**: *80.0*  
-Query cover thershold for BLAST alignment. Alignments with query cover less than thershold are not counted.
+Query cover percent thershold for BLAST alignment. Alignments with query cover less than thershold are not counted.
 
 ### `--low-memory`
 
@@ -150,9 +150,14 @@ Prints the version info of REcomp2
 
 ## Examples
 
-### Basic usage
 
 ```bash
-# find all superclusters
-./REcomp.py ''
+# find all superclusters using default parameters
+./REcomp.py '~/RE_result1 ~/RE_result2' 'p1 p2' ~/REcopm2_output -r ~/references.fasta
+# find all superclusters using default parameters and log-file
+./REcomp.py '~/RE_result1 ~/RE_result2' 'p1 p2' ~/REcopm2_output -r ~/references.fasta -l
+# find all superclusters incliding 'other' using default parameters 
+./REcomp.py '~/RE_result1 ~/RE_result2' 'p1 p2' ~/REcopm2_output -r ~/references.fasta -io
+# find all superclusters incliding 'other' using less memory
+./REcomp.py '~/RE_result1 ~/RE_result2' 'p1 p2' ~/REcopm2_output -r ~/references.fasta -io --low-memory
 ```
