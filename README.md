@@ -40,10 +40,8 @@ which gives the following output
 
 ```
 usage: REcomp.py [-h] [-v] [-r REF] [-l] [-c CPU] [-io] [-ir]
-                [--evalue EVALUE] [--ident IDENTITY_PERC]
-                [--qcov QUERY_COVER] [--low-memory] path prefix out
-
-REcomp2
+                 [--evalue EVALUE] [--ident IDENTITY_PERC]
+                 [--qcov QUERY_COVER] [--low-memory] path prefix out
 
 positional arguments:
   path                  path(s) to RE results (top level)
@@ -69,3 +67,11 @@ optional arguments:
 ```
 
 The details of each option are given below:
+
+```
+path
+```
+
+**Expects**: Path to RE results
+**Default**: None
+The input is
