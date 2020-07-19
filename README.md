@@ -5,7 +5,6 @@ Pipeline for comparative analysis potentially unlimited results of RepeatExplore
 ## Description
 
 ## Installation
----
 
 Pipeline was tested on Ubuntu 18.04.3
 
@@ -40,7 +39,9 @@ The help message and available options can be accessed using
 which gives the following output
 
 ```
-usage: REcomp.py [-h] [-v] [-r REF] [-l] [-c CPU] [-io] [-ir] [--evalue EVALUE] [--ident IDENTITY_PERC] [--qcov QUERY_COVER] [--low-memory] path prefix out
+usage: REcomp.py [-h] [-v] [-r REF] [-l] [-c CPU] [-io] [-ir]
+                [--evalue EVALUE] [--ident IDENTITY_PERC]
+                [--qcov QUERY_COVER] [--low-memory] path prefix out
 
 REcomp2
 
@@ -63,7 +64,8 @@ optional arguments:
   --ident IDENTITY_PERC
                         identity percent threshold for alignment for superclusters assembly (default: 90.0)
   --qcov QUERY_COVER    query cover threshold for alignment for superclusters assembly (default: 80.0)
-  --low-memory          use small amount of RAM for 'all to all' blast by using small chunk size (1000) but it can take much time (default chunk size: 10000)
+  --low-memory          use small amount of RAM for 'all to all' blast by using small chunk size (1000)
+  but it can take much time (default chunk size: 10000)
 ```
 
 The details of each option are given below:
