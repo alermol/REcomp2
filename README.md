@@ -115,3 +115,13 @@ Number of cores for REcomp2 work.
 By default the 'other' clusters and contigs does not included in analysis. If this arguments in set, contigs from 'other' clusters is included in analysis that can dramatically increase worktime, especially if `--low-memory` (see below) is turn on.
 
 ### `-ir or --include-ribosomal`
+
+**Expects**: *None*  
+**Default**: *False*  
+This parameter activates including in analysis the rDNA consensuses (rank 4).
+
+### `--evalue`
+
+**Expects**: *0.0 <= FLOAT*  
+**Default**: *1e-05*
+E-value threshold for 
