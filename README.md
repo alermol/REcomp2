@@ -70,8 +70,19 @@ The details of each option are given below:
 
 ### `path`
 
-**Expects**: Path to RE results  
+**Expects**: STRING  
 **Default**: None  
-The input for this argument is string in quotes that contain space separated paths to top level of RepeatExplorer results.  
+The input for this argument is string in quotes that contains space separated paths to top level of RepeatExplorer results. Paths must not be repeated. This argument is required.  
 **Example**  
-```"~/RE_results1 ~/RE_results2"```
+```"~/RE_result1 ~/RE_result2"```
+
+### `prefix`
+
+**Expects**: STRING  
+**Default**: None  
+This argument take in a string in quotes that contains space seaparted prefixes for each paths in `path` argument. Each one prefix must be matching only one path. Prefixes must not be repeated. Short prefixes are recomended. This argument is requered.  
+**Example**  
+```"p1 p2"```
+
+### `out`
+
