@@ -70,6 +70,8 @@ The details of each option are given below:
 
 ### `path`
 
-**Expects**: Path to RE results
-**Default**: None
-The input is
+**Expects**: Path to RE results  
+**Default**: None  
+The input for this argument is string in quotes that contain space separated paths to top level of RepeatExplorer results.  
+**Example**  
+```"~/RE_results1 ~/RE_results2"```
