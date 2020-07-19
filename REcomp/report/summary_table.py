@@ -14,9 +14,6 @@ class ReportTableConstructor:
     """
     Class contain methods for building of report table based on results of REcomp
     """
-    # def __init__ (self):
-    #     self.LOGGER = logging.getLogger(__name__)
-    #     self.LOGGER.setLevel(logging.DEBUG)
 
     def parse_tarean_report(self, path):
         with open(path, "r") as tarean_report:
@@ -38,9 +35,8 @@ class ReportTableConstructor:
         """
         gl_repex_path = re.search(r"seqclust.*png",
                                   value.split(">")[0]).group(0)
-        copy_from_path = str(Path(repex_results_path).parent) + "/" + gl_repex_path
-        copy_to_path = str(recomp_results_path) + re.search(r"/dir_CL[0-9]+.*",
-                                                            gl_repex_path).group(0)
+        copy_from_path = Path(repex_results_path).parent.joinpath(gl_repex_path)
+        copy_to_path = Path(recomp_results_path).joinpath(re.search(r"dir_CL[0-9]+.*", gl_repex_path).group(0))
         Path(copy_to_path).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(copy_from_path, copy_to_path)
         return copy_to_path
@@ -63,7 +59,7 @@ class ReportTableConstructor:
                                                                   repex_results_path,
                                                                   recomp_results_path)
                                 for value in cluster_list[6]]
-        cluster_graph_layout = [re.search(r"report.*", path).group(0)
+        cluster_graph_layout = [re.search(r"report.*", str(path)).group(0)
                                 for path in cluster_graph_layout]
         cluster_annotation = [re.search(r"[\w\s\(\)]+", value).group(0)
                               for value in cluster_list[10]]
@@ -89,8 +85,11 @@ class ReportTableConstructor:
         """
         Function define type of supercluster in fasta file
         """
-        references = set(SeqIO.to_dict(SeqIO.parse(path_to_references,
-                                                   "fasta")).keys())
+        if path_to_references:
+            references = set(SeqIO.to_dict(SeqIO.parse(path_to_references,
+                                                       "fasta")).keys())
+        else:
+            references = []
         fasta_id = set(list(SeqIO.to_dict(SeqIO.parse(path_to_fasta,
                                                        "fasta")).keys()))
         if len(fasta_id.intersection(references)) >= 1:
@@ -109,8 +108,11 @@ class ReportTableConstructor:
         Function does compile table with data about each superclusters from
         results of REcomp
         """
-        references_id = list(SeqIO.to_dict(SeqIO.parse(path_to_references,
-                                                       "fasta")).keys())
+        if path_to_references:
+            references_id = list(SeqIO.to_dict(SeqIO.parse(path_to_references,
+                                                        "fasta")).keys())
+        else:
+            references_id = []
         paths = [path for path in path_to_fasta.rglob("*.fasta")
                  if any(map(str.isdigit, Path(path).name))]
         recomp_results_table = pd.DataFrame()

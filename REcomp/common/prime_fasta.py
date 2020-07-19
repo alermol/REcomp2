@@ -26,8 +26,10 @@ class PrimeFastaWriter:
         if (len(id_list) == 1 and "_TR_1_x_" not in id_list[0] or
             len(id_list) == 1 and "Contig" in id_list[0] or
             not any("_TR_1_x_" in i for i in id_list)):
+            print(f"Supercluster {scl_num} assembly - PASS", end="\n\n")
             return
         else:
+            print(f"Supercluster {scl_num} assembly - OK", end="\n\n")
             if (len(id_list) == 1 and "_TR_1_x_" in id_list[0] or
                 not any("Contig" in i for i in id_list)):
                 file = Path(self.final_output).joinpath(f"supercluster{scl_num}.fasta")

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from Bio.Blast.Applications import NcbiblastnCommandline
 
@@ -8,13 +10,15 @@ class FastaAligner:
                  evalue,
                  perc_identity,
                  qcov_hsp_perc):
-        # self.path_to_fasta = path_to_fasta
         self.evalue = evalue
         self.perc_identity = perc_identity
         self.qcov_hsp_perc = qcov_hsp_perc
 
 
     def align_fasta(self, pair):
+        """
+        Create connectivity table for QU using blast
+        """
         cline = NcbiblastnCommandline(query=pair[0],
                                       subject=pair[1],
                                       out="-",

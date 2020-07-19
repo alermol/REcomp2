@@ -4,6 +4,8 @@ from pathlib import Path
 
 from Bio import SeqIO
 
+import config
+
 
 class PrepFasta:
     """
@@ -13,11 +15,10 @@ class PrepFasta:
         self.path_to_results = path_to_results
         self.known_fasta = known_fasta
         self.prefix = prefix
-        self.RANK1 = "TAREAN_consensus_rank_1.fasta"
-        self.RANK2 = "TAREAN_consensus_rank_2.fasta"
-        self.RANK3 = "TAREAN_consensus_rank_3.fasta"
-        self.RANK4 = "TAREAN_consensus_rank_4.fasta"
-        # self.OUT_NAME = prefix + "_ranks123.fasta"
+        self.RANK1 = config.CONSENSUS_FILES["RANK1"]
+        self.RANK2 = config.CONSENSUS_FILES["RANK2"]
+        self.RANK3 = config.CONSENSUS_FILES["RANK3"]
+        self.RANK4 = config.CONSENSUS_FILES["RANK4"]
         self.LOGGER = logging.getLogger(__name__)
         self.LOGGER.setLevel(logging.DEBUG)
 
@@ -43,7 +44,7 @@ class PrepFasta:
         Function does generate list of directories names of "other" clusters
         """
         rank_dirs = self.__get_ranks_dir()
-        dirs = Path(self.path_to_results + "/seqclust/clustering/clusters")
+        dirs = Path(self.path_to_results).joinpath("seqclust", "clustering", "clusters")
         other_dirs = []
         for d in dirs.iterdir():
             if ".." in d.name or d.name in rank_dirs:
@@ -62,21 +63,21 @@ class PrepFasta:
         with open(Path(path_to_output).joinpath("fasta.fasta"), "a") as out:
             # ranks
             for file in ranks_files:
-                path = self.path_to_results + "/" + file
+                path = Path(self.path_to_results).joinpath(file)
                 with open(path, "r") as rank_fasta:
                     for consensus in SeqIO.parse(rank_fasta, "fasta"):
-                        consensus.id = self.prefix + "_" + consensus.id
+                        consensus.id = f"{self.prefix}_{consensus.id}"
                         consensus.description = ""
                         SeqIO.write(consensus, out, "fasta")
             # other
             if not exclude_other:
                 other_dirs = self.__get_other_dir()
-                path = self.path_to_results + "/seqclust/clustering/clusters"
+                path = Path(self.path_to_results).joinpath("seqclust", "clustering", "clusters")
                 for file in other_dirs:
-                    path_to_cont = path + "/" + file + "/" + "contigs.fasta"
+                    path_to_cont = Path(path).joinpath(file, "contigs.fasta")
                     with open(path_to_cont, "r") as cont_fasta:
                         for contig in SeqIO.parse(cont_fasta, "fasta"):
-                            contig.id = self.prefix + "_" + contig.id
+                            contig.id = f"{self.prefix}_{contig.id}"
                             contig.description = ""
                             SeqIO.write(contig, out, "fasta")
 
@@ -95,41 +96,3 @@ class PrepFasta:
                 batch.append(entery)
             if batch:
                 yield batch
-
-
-
-    # def get_others_fasta(self, path_to_others):
-    #     """
-    #     Function does create fasta file(s) of "others" contigs in directory
-    #     required by user
-    #     """
-    #     # logging.info(f"copying of fasta files containing 'other' contigs from {self.path_to_results}")
-    #     other_dirs = self.__get_other_dir()
-    #     other_fasta_name = path_to_others + "/" + self.prefix + "_other_contigs.fasta"
-    #     path = self.path_to_results + "/seqclust/clustering/clusters"
-    #     with open(other_fasta_name, "w") as out_fasta:
-    #         for od in other_dirs:
-    #             path_to_cont = path + "/" + od + "/" + "contigs.fasta"
-    #             with open(path_to_cont, "r") as cont_fasta:
-    #                 for contig in SeqIO.parse(cont_fasta, "fasta"):
-    #                     contig.id = self.prefix + "_" + contig.id
-    #                     contig.description = ""
-    #                     SeqIO.write(contig, out_fasta, "fasta")
-
-
-    # def get_ranks_fasta(self, path_to_ranks):
-    #     """
-    #     Function does create fasta file(s) of ranks consensuses in directory
-    #     required by user
-    #     """
-    #     # logging.info(f"copying of fasta files containing rank's consensuses from {self.path_to_results}")
-    #     ranks_files = [self.RANK1, self.RANK2, self.RANK3]
-    #     ranks_fasta_path = path_to_ranks + "/" + self.OUT_NAME
-    #     for file in ranks_files:
-    #         path = self.path_to_results + "/" + file
-    #         with open(path, "r") as inp_fasta:
-    #             with open(ranks_fasta_path, "a") as out_fasta:
-    #                 for consensus in SeqIO.parse(inp_fasta, "fasta"):
-    #                     consensus.id = self.prefix + "_" + consensus.id
-    #                     consensus.description = ""
-    #                     SeqIO.write(consensus, out_fasta, "fasta")

@@ -9,7 +9,6 @@ from sqlalchemy import create_engine
 from yattag import Doc, indent
 
 
-#TODO Add run parameters and thersholds in report
 class HtmlReportGenerator:
     def __init__(self,
                  path_to_report_table,

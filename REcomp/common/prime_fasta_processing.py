@@ -33,10 +33,6 @@ class FastaFinalizer:
         if len(require_pref) == 0:
             return
         tmp_id = self.__tmp_other_id(require_pref, other_id)
-        # prime_list = [path for path in self.path_to_prime.rglob("*.fasta")]
-        # for pfasta in prime_list:
-        #     dest = pfasta.parent.joinpath(f"{pfasta.stem}_tmp.fasta")
-        #     shutil.copyfile(pfasta, dest)
         with open(self.path_to_prime.joinpath(f"{path_to_fasta.stem}_tmp.fasta"),
                   "w") as tmp, open(self.path_to_prime.joinpath(path_to_fasta.name)) as src:
             for record in SeqIO.parse(src, "fasta"):
@@ -47,6 +43,7 @@ class FastaFinalizer:
                                       out="-",
                                       outfmt="6 qseqid sseqid evalue bitscore",
                                       max_hsps=1)
+        print(cline)
         output = cline()[0].strip()
         rows = [line.split() for line in output.splitlines()]
         cols = ["qseqid", "sseqid", "evalue", "bitscore"]
@@ -70,7 +67,6 @@ class FastaFinalizer:
                         SeqIO.write(record, ffasta, "fasta")
                     else:
                         continue
-        # return require_pref
 
 
     def __tmp_other_id(self, pref_list, other_id):

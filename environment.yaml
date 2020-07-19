@@ -1,0 +1,16 @@
+name: recomp2
+chanells:
+  - conda
+  - pypi
+dependencies:
+  - python 3.8.*
+  - bs4
+  - biopython
+  - lxml
+  - natsort
+  - numpy
+  - pandas
+  - prettytable
+  - python-algoriths
+  - sqlalchemy
+  - yattag
