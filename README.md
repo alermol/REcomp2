@@ -68,9 +68,7 @@ optional arguments:
 
 The details of each option are given below:
 
-```
-path
-```
+### `path`
 
 **Expects**: Path to RE results
 **Default**: None
