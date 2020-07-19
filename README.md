@@ -65,7 +65,7 @@ optional arguments:
                         identity percent threshold for alignment for superclusters assembly (default: 90.0)
   --qcov QUERY_COVER    query cover threshold for alignment for superclusters assembly (default: 80.0)
   --low-memory          use small amount of RAM for 'all to all' blast by using small chunk size (1000)
-  but it can take much time (default chunk size: 10000)
+                        but it can take much time (default chunk size: 10000)
 ```
 
 The details of each option are given below:
