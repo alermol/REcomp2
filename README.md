@@ -122,6 +122,28 @@ This parameter activates including in analysis the rDNA consensuses (rank 4).
 
 ### `--evalue`
 
-**Expects**: *0.0 <= FLOAT*  
-**Default**: *1e-05*
-E-value threshold for 
+**Expects**: *FLOAT >= 0.0*  
+**Default**: *1e-05*  
+E-value threshold for BLAST alignment. Alignments with E-value greater than this threshold are not counted.
+
+### `--ident`
+
+**Expects**: *0.0 <= FLOAT <= 100.0*  
+**Default**: *90.0*  
+Identity percent thershold for BLAST alignment. Alignments with identity percent less than thershold are not counted.
+
+### `--qcov`
+
+**Expects**: *0.0 <= FLOAT <= 100.0*  
+**Default**: *80.0*  
+Query cover thershold for BLAST alignment. Alignments with query cover less than thershold are not counted.
+
+### `--low-memory`
+
+**Expects**: *None*  
+**Default**: *False*  
+If this parameters in set, fasta file will be splitted in chunk with less size. This allow to use less amount of memory during 'all to all blast' step.
+
+### `-v or --version`
+
+Prints the version info of REcomp2
