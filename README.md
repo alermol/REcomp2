@@ -85,8 +85,33 @@ This argument take in a string in quotes that contains space seaparted prefixes 
 ```"p1 p2"```
 
 ### `out`
+
 **Expect**: *STRING (to be used as a path to directory)*  
 **Default**: *None*  
 This is the last required argument for REcomp2. Points to directory for results saving. If directory does not exist, it will be created.  
-**Example**  
-```"~/REcomp_result"```
+
+### `-r or --references`
+
+**Expects**: *STRING (to be used as a path to file)*  
+**Default**: *None*  
+File containing references in FASTA format. Files with multiple sequences are also valid. Multi-FASTA must not contain identical records id.
+
+### `-l`
+
+**Expects**: *None*  
+**Default**: *False*  
+If this argument in set `logfile.log` will be saved in output directory.
+
+### `-c`
+
+**Expects**: *INTEGER*  
+**Default**: *All system cores*  
+Number of cores for REcomp2 work.
+
+### `-io or --include-other`
+
+**Expects**: *None*  
+**Default**: *False*  
+By default the 'other' clusters and contigs does not included in analysis. If this arguments in set, contigs from 'other' clusters is included in analysis that can dramatically increase worktime, especially if `--low-memory` (see below) is turn on.
+
+### `-ir or --include-ribosomal`
