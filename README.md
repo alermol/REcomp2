@@ -1,12 +1,32 @@
 # REcomp2
 
-Pipeline for comparative analysis potentially unlimited results of RepeatExplorer runs
+Pipeline for comparative analysis potentially unlimited number results of RepeatExplorer runs
 
 ## Description
 
-## Installation
+Pipeline performs clustering of consensues and 'other' contigs (optionally) from potentially unlimited number of RepeatExplorer runs based on sequences homology that detecting using BLASTn.
 
-Pipeline was tested on Ubuntu 18.04.3
+Main steps of pipeline's work:  
+
+1. Collection of all sequences for analysis (consensuses, references (if presented) and contigs (optionally)) in one FASTA file
+
+2. Split FASTA file in chunks for parallel
+
+3. All to all chunks BLASTn for building of the connectivity table
+
+4. Building a graph in memory using QuickUnion algorithm
+
+5. Extraction all connectivity components in graph
+
+6. Filtration of connectivity components based on their content
+
+7. Writing of selected superclusters in separate FASTA
+
+8. Filtering contigs if necessary
+
+9. Report with information about each selected supercluster generation
+
+## Installation
 
 Install Anaconda with python 3 from [official website](https://www.anaconda.com/products/individual)
 
@@ -26,6 +46,8 @@ cd REcomp
 ```
 
 If test run has been done successfully than pipeline is ready to work
+
+Pipeline was tested on Ubuntu 18.04.3
 
 ## Usage
 
@@ -150,13 +172,12 @@ Prints the version info of REcomp2
 
 ## Examples
 
-
 ```bash
 # find all superclusters using default parameters
 ./REcomp.py '~/RE_result1 ~/RE_result2' 'p1 p2' ~/REcopm2_output -r ~/references.fasta
 # find all superclusters using default parameters and log-file
 ./REcomp.py '~/RE_result1 ~/RE_result2' 'p1 p2' ~/REcopm2_output -r ~/references.fasta -l
-# find all superclusters incliding 'other' using default parameters 
+# find all superclusters incliding 'other' using default parameters
 ./REcomp.py '~/RE_result1 ~/RE_result2' 'p1 p2' ~/REcopm2_output -r ~/references.fasta -io
 # find all superclusters incliding 'other' using less memory
 ./REcomp.py '~/RE_result1 ~/RE_result2' 'p1 p2' ~/REcopm2_output -r ~/references.fasta -io --low-memory
