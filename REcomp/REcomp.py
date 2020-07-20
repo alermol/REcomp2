@@ -261,6 +261,10 @@ report_generator = HtmlReportGenerator(out_path.joinpath("report",
                                        out_path.joinpath("report.html"),
                                        args)
 report_generator.generate_report()
-shutil.copyfile(Path.cwd().joinpath("report", "style1.css"),
-                out_path.joinpath("style1.css"))
+try:
+    shutil.copyfile(Path.cwd().joinpath("REcomp", "report", "style1.css"),
+                    out_path.joinpath("style1.css"))
+except FileNotFoundError:
+    shutil.copyfile(Path.cwd().joinpath("report", "style1.css"), 
+                    out_path.joinpath("style1.css"))
 logging.info("DONE")
