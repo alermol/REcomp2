@@ -107,4 +107,5 @@ dmypy.json
 
 
 .vscode/
-.REcomp/test_data/test_output_*/
+.REcomp/test_data/test_output_io/
+.REcomp/test_data/test_output_nio/
