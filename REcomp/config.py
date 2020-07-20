@@ -22,5 +22,6 @@ INPUT_DIRS = {"sample1": "test_data/S1",
 PREFIXES = {"sample1": "S1",
             "sample2": "S2"}
 REFERENCES = "test_data/test_references.fasta"
-OUTPUT_DIR = "test_data/test_output"
+OUTPUT_DIR_IO = "test_data/test_output_io"
+OUTPUT_DIR_NIO = "test_data/test_output_nio"
 CPU_COUNT = "4"

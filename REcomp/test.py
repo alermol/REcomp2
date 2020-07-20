@@ -17,10 +17,20 @@ check_input = check_input.CheckInput()
 check_input.check_blast(os.environ["PATH"])
 
 # test run
+# include other
 command = (
     f"./REcomp.py '{' '.join([config.INPUT_DIRS['sample1'], config.INPUT_DIRS['sample2']])}' "
-    f"'{' '.join([config.PREFIXES['sample1'], config.PREFIXES['sample2']])}' {config.OUTPUT_DIR} "
+    f"'{' '.join([config.PREFIXES['sample1'], config.PREFIXES['sample2']])}' {config.OUTPUT_DIR_IO} "
+    f" -r {config.REFERENCES} -l -c {config.CPU_COUNT} -io"
+)
+Path(config.OUTPUT_DIR_IO).mkdir(parents=True, exist_ok=True)
+os.system(command)
+
+# not include other
+command = (
+    f"./REcomp.py '{' '.join([config.INPUT_DIRS['sample1'], config.INPUT_DIRS['sample2']])}' "
+    f"'{' '.join([config.PREFIXES['sample1'], config.PREFIXES['sample2']])}' {config.OUTPUT_DIR_NIO} "
     f" -r {config.REFERENCES} -l -c {config.CPU_COUNT}"
 )
-Path(config.OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+Path(config.OUTPUT_DIR_NIO).mkdir(parents=True, exist_ok=True)
 os.system(command)
