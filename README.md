@@ -10,7 +10,7 @@ Main steps of pipeline's work:
 
 1. Collection of all sequences for analysis (consensuses, references (if presented) and contigs (optionally)) in one FASTA file
 
-2. Split FASTA file in chunks for parallel
+2. Spliting FASTA file in chunks for parallel BLASTn
 
 3. All to all chunks BLASTn for building of the connectivity table
 
