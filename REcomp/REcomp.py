@@ -89,6 +89,9 @@ assert args.evalue >= 0.0, ("Wrong E-value thershold")
 assert 0.0 <= args.identity_percent <= 100.0, ("Wrong identity percent thershold")
 assert 0.0 <= args.query_cover <= 100.0, ("Wrong query cover thershold")
 
+out_path = Path(args.out)
+out_path.mkdir(parents=True, exist_ok=True)
+
 # logging
 if args.log:
     logging.basicConfig(level=logging.DEBUG,
@@ -104,10 +107,9 @@ else:
     logging.basicConfig(level=logging.INFO,
                         format="\n%(asctime)s - %(funcName)s - %(levelname)s -\n%(message)s\n")
 
-
 logging.info("""
 ------------------------------------------------------------------
-PIPELINE VERSION               :           2.0.0
+PIPELINE VERSION               :           2.1.0
 
 AUTHOR                         :      Aleksey Ermolaev
 ------------------------------------------------------------------
@@ -128,9 +130,6 @@ time.sleep(30)
 
 # create folder structure
 logging.info("creating directory structure")
-out_path = Path(args.out)
-out_path.mkdir(parents=True, exist_ok=True)
-
 fasta_path = Path(args.out).joinpath("fasta")
 fasta_path.mkdir(parents=True, exist_ok=True)
 
