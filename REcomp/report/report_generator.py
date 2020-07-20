@@ -1,12 +1,14 @@
 import itertools
 import logging
 import re
+import base64
 
 import numpy as np
 import pandas as pd
 from natsort import natsorted
 from sqlalchemy import create_engine
 from yattag import Doc, indent
+from pathlib import Path
 
 
 class HtmlReportGenerator:
@@ -19,6 +21,12 @@ class HtmlReportGenerator:
         self.args = args
         self.LOGGER = logging.getLogger(__name__)
         self.LOGGER.setLevel(logging.DEBUG)
+        
+        
+    def __picture_to_string(self, picture):
+        with open(Path(self.args.out).joinpath(picture), "rb") as imageFile:
+            pic_str = base64.b64encode(imageFile.read())
+            return b"data:image/png;base64," + pic_str
 
 
     def generate_report(self):
@@ -128,7 +136,7 @@ class HtmlReportGenerator:
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
                                 doc.stag("img",
-                                        src=scl_info[4],
+                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
                                         width="120", border=0)
                         with tag("td"):
                             text(scl_info[5])
@@ -166,7 +174,7 @@ class HtmlReportGenerator:
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
                                 doc.stag("img",
-                                        src=scl_info[4],
+                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
                                         width="120", border=0)
                         with tag("td"):
                             text(scl_info[5])
@@ -283,7 +291,7 @@ class HtmlReportGenerator:
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
                                 doc.stag("img",
-                                        src=scl_info[4],
+                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
                                         width="120", border=0)
                         with tag("td"):
                             text(scl_info[5])
@@ -321,7 +329,7 @@ class HtmlReportGenerator:
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
                                 doc.stag("img",
-                                        src=scl_info[4],
+                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
                                         width="120", border=0)
                         with tag("td"):
                             text(scl_info[5])
@@ -403,7 +411,7 @@ class HtmlReportGenerator:
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
                                 doc.stag("img",
-                                        src=scl_info[4],
+                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
                                         width="120", border=0)
                         with tag("td"):
                             text(scl_info[5])
@@ -441,7 +449,7 @@ class HtmlReportGenerator:
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
                                 doc.stag("img",
-                                        src=scl_info[4],
+                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
                                         width="120", border=0)
                         with tag("td"):
                             text(scl_info[5])
@@ -513,7 +521,7 @@ class HtmlReportGenerator:
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
                                 doc.stag("img",
-                                        src=scl_info[4],
+                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
                                         width="120", border=0)
                         with tag("td"):
                             text(scl_info[5])

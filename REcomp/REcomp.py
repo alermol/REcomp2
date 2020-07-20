@@ -33,7 +33,7 @@ parser = argparse.ArgumentParser(description="REcomp2",
 parser.add_argument("-v", "--version",
                     help="show version",
                     action="version",
-                    version="REcomp 2.1.0")
+                    version="REcomp 2.1.1")
 parser.add_argument("i", help="path(s) to RE results (top level)",
                     type=str,
                     metavar="path")
