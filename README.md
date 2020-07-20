@@ -24,7 +24,7 @@ Main steps of pipeline's work:
 
 8. Filtering contigs if necessary
 
-9. Report with information about each selected supercluster generation
+9. Report generation with information about each selected supercluster
 
 ## Installation
 
