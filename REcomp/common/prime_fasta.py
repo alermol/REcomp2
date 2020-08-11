@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 from Bio import SeqIO
@@ -18,23 +17,24 @@ class PrimeFastaWriter:
         self.map_dict = map_dict
         self.uf_list = uf_list
 
-
     def write_fasta(self, scl_num):
-        ind_list = [i for i,value in enumerate(self.uf_list)
+        ind_list = [i for i, value in enumerate(self.uf_list)
                     if value == scl_num]
         id_list = [self.map_dict[i] for i in ind_list]
-        if (len(id_list) == 1 and "_TR_1_x_" not in id_list[0] or
-            len(id_list) == 1 and "Contig" in id_list[0] or
-            not any("_TR_1_x_" in i for i in id_list)):
-            print(f"Supercluster {scl_num} assembly - PASS", end="\n\n")
+        if len(id_list) == 1 and "_TR_1_x_" not in id_list[0] or \
+           len(id_list) == 1 and "Contig" in id_list[0] or \
+           not any("_TR_1_x_" in i for i in id_list):
             return
         else:
-            print(f"Supercluster {scl_num} assembly - OK", end="\n\n")
-            if (len(id_list) == 1 and "_TR_1_x_" in id_list[0] or
-                not any("Contig" in i for i in id_list)):
-                file = Path(self.final_output).joinpath(f"supercluster{scl_num}.fasta")
+            if len(id_list) == 1 and "_TR_1_x_" in id_list[0] or \
+               not any("Contig" in i for i in id_list):
+                file = Path(self.final_output).joinpath(
+                    f"supercluster{scl_num}.fasta"
+                )
             else:
-                file = Path(self.prime_output).joinpath(f"supercluster{scl_num}.fasta")
+                file = Path(self.prime_output).joinpath(
+                    f"supercluster{scl_num}.fasta"
+                )
             with open(file, "w") as output_fasta:
                 for record in SeqIO.parse(open(self.input_fasta), "fasta"):
                     if record.id in id_list:

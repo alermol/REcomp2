@@ -11,6 +11,7 @@ class PrepFasta:
     """
     Class contains methods for extracting main fasta files from RE results
     """
+
     def __init__(self, path_to_results, known_fasta, prefix):
         self.path_to_results = path_to_results
         self.known_fasta = known_fasta
@@ -38,13 +39,14 @@ class PrepFasta:
                 known_cl.append("dir_" + "CL" + cl_num_part[-4:])
         return known_cl
 
-
     def __get_other_dir(self):
         """
         Function does generate list of directories names of "other" clusters
         """
         rank_dirs = self.__get_ranks_dir()
-        dirs = Path(self.path_to_results).joinpath("seqclust", "clustering", "clusters")
+        dirs = Path(self.path_to_results).joinpath("seqclust",
+                                                   "clustering",
+                                                   "clusters")
         other_dirs = []
         for d in dirs.iterdir():
             if ".." in d.name or d.name in rank_dirs:
@@ -52,7 +54,6 @@ class PrepFasta:
             else:
                 other_dirs.append(d.name)
         return other_dirs
-
 
     def create_united_fasta(self, path_to_output,
                             include_other=False, include_ribosomal=False):
@@ -72,7 +73,9 @@ class PrepFasta:
             # other
             if include_other:
                 other_dirs = self.__get_other_dir()
-                path = Path(self.path_to_results).joinpath("seqclust", "clustering", "clusters")
+                path = Path(self.path_to_results).joinpath("seqclust",
+                                                           "clustering",
+                                                           "clusters")
                 for file in other_dirs:
                     path_to_cont = Path(path).joinpath(file, "contigs.fasta")
                     with open(path_to_cont, "r") as cont_fasta:
@@ -80,7 +83,6 @@ class PrepFasta:
                             contig.id = f"{self.prefix}_{contig.id}"
                             contig.description = ""
                             SeqIO.write(contig, out, "fasta")
-
 
     def batch_iterator(self, iterator, batch_size):
         entery = True

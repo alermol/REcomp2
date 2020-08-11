@@ -10,21 +10,23 @@ Main steps of pipeline's work:
 
 1. Collection of all sequences for analysis (consensuses, references (if presented) and contigs (optionally)) in one FASTA file
 
-2. Spliting FASTA file in chunks for parallel BLASTn
+2. Spliting FASTA file in chunks for parallel BLAST
 
-3. All to all chunks BLASTn for building of the connectivity table
+3. All to all chunks megaBLAST for building of the connectivity table
 
-4. Building a graph in memory using QuickUnion algorithm
+4. Dropping of junk alignment using K-means or agglomerative clustering
 
-5. Extraction all connectivity components in graph
+5. Building a graph in memory using QuickUnion algorithm
 
-6. Filtration of connectivity components based on their content
+6. Extraction all connectivity components in graph
 
-7. Writing of selected superclusters in separate FASTA
+7. Filtration of connectivity components based on their content
 
-8. Filtering contigs if necessary
+8. Writing of selected superclusters in separate FASTA
 
-9. Report generation with information about each selected supercluster
+9. Filtering contigs if necessary using BLASTn
+
+10. Report generation with information about each selected supercluster
 
 ## Installation
 
@@ -40,7 +42,6 @@ Unzip archive in installation directory
 cd REcomp2-master
 conda env create -f environment.yaml
 conda activate recomp
-pip install python_algorithms
 cd REcomp
 ./test.py
 ```
@@ -62,8 +63,7 @@ which gives the following output
 
 ```None
 usage: REcomp.py [-h] [-v] [-r REF] [-l] [-c CPU] [-io] [-ir]
-                 [--evalue EVALUE] [--ident IDENTITY_PERC]
-                 [--qcov QUERY_COVER] [--low-memory] path prefix out
+                 [--evalue EVALUE] [--low-memory] path prefix out
 
 positional arguments:
   path                  path(s) to RE results (top level)
@@ -81,9 +81,6 @@ optional arguments:
   -ir, --include-ribosomal
                         include rDNA clusters (rank 4) in analysis (default: False)
   --evalue EVALUE       evalue threshold for alignments for supercluster assembly (default: 1e-05)
-  --ident IDENTITY_PERC
-                        identity percent threshold for alignment for superclusters assembly (default: 90.0)
-  --qcov QUERY_COVER    query cover threshold for alignment for superclusters assembly (default: 80.0)
   --low-memory          use small amount of RAM for 'all to all' blast by using small chunk size (1000)
                         but it can take much time (default chunk size: 10000)
 ```
@@ -147,18 +144,6 @@ This parameter activates including in analysis the rDNA consensuses (rank 4).
 **Expects**: *FLOAT >= 0.0*  
 **Default**: *1e-05*  
 E-value threshold for BLAST alignment. Alignments with E-value greater than this threshold are not counted.
-
-### `--ident`
-
-**Expects**: *0.0 <= FLOAT <= 100.0*  
-**Default**: *90.0*  
-Identity percent thershold for BLAST alignment. Alignments with identity percent less than thershold are not counted.
-
-### `--qcov`
-
-**Expects**: *0.0 <= FLOAT <= 100.0*  
-**Default**: *80.0*  
-Query cover percent thershold for BLAST alignment. Alignments with query cover less than thershold are not counted.
 
 ### `--low-memory`
 

@@ -5,9 +5,6 @@
 Test run
 """
 import os
-import subprocess
-import sys
-from pathlib import Path
 
 import config
 from common import check_input
@@ -17,20 +14,22 @@ check_input = check_input.CheckInput()
 check_input.check_blast(os.environ["PATH"])
 
 # test run
+input_path = (
+    f"{' '.join([config.INPUT_DIRS['sample1'], config.INPUT_DIRS['sample2']])}"
+)
+prefixes = (
+    f"{' '.join([config.PREFIXES['sample1'], config.PREFIXES['sample2']])}"
+)
 # include other
 command = (
-    f"./REcomp.py '{' '.join([config.INPUT_DIRS['sample1'], config.INPUT_DIRS['sample2']])}' "
-    f"'{' '.join([config.PREFIXES['sample1'], config.PREFIXES['sample2']])}' {config.OUTPUT_DIR_IO} "
-    f" -r {config.REFERENCES} -l -c {config.CPU_COUNT} -io"
+    f"./REcomp.py '{input_path}' '{prefixes}' {config.OUTPUT_DIR_IO} "
+    f" -r {config.REFERENCES} -l -c {config.CPU_COUNT} -io --low-memory"
 )
-Path(config.OUTPUT_DIR_IO).mkdir(parents=True, exist_ok=True)
 os.system(command)
 
 # not include other
 command = (
-    f"./REcomp.py '{' '.join([config.INPUT_DIRS['sample1'], config.INPUT_DIRS['sample2']])}' "
-    f"'{' '.join([config.PREFIXES['sample1'], config.PREFIXES['sample2']])}' {config.OUTPUT_DIR_NIO} "
-    f" -r {config.REFERENCES} -l -c {config.CPU_COUNT}"
+    f"./REcomp.py '{input_path}' '{prefixes}' {config.OUTPUT_DIR_NIO} "
+    f"-r {config.REFERENCES} -l -c {config.CPU_COUNT}"
 )
-Path(config.OUTPUT_DIR_NIO).mkdir(parents=True, exist_ok=True)
 os.system(command)

@@ -2,11 +2,10 @@
 All configuration for REcomp
 """
 
+PIPELINE_VERSION = "2.1.2"
+
 # default run parameters
 EVALUE = 1e-05
-IDENTITY_PERCENT = 90.0
-QUERY_COVER = 80.0
-
 CHUNK_SIZE = 10000
 
 # consensuses files

@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pandas as pd
 from Bio.Blast.Applications import NcbiblastnCommandline
 
@@ -7,13 +5,8 @@ from Bio.Blast.Applications import NcbiblastnCommandline
 class FastaAligner:
 
     def __init__(self,
-                 evalue,
-                 perc_identity,
-                 qcov_hsp_perc):
+                 evalue):
         self.evalue = evalue
-        self.perc_identity = perc_identity
-        self.qcov_hsp_perc = qcov_hsp_perc
-
 
     def align_fasta(self, pair):
         """
@@ -22,14 +15,14 @@ class FastaAligner:
         cline = NcbiblastnCommandline(query=pair[0],
                                       subject=pair[1],
                                       out="-",
-                                      outfmt="6 qseqid sseqid",
-                                      evalue=self.evalue,
-                                      perc_identity=self.perc_identity,
-                                      qcov_hsp_perc=self.qcov_hsp_perc)
-        print(cline)
+                                      outfmt="6 qseqid sseqid pident qcovs",
+                                      evalue=self.evalue)
         output = cline()[0].strip()
         rows = [line.split() for line in output.splitlines()]
-        cols = ["qseqid", "sseqid"]
-        data_types = {"qseqid": str, "sseqid": str}
+        cols = ["qseqid", "sseqid", "pident", "qcovs"]
+        data_types = {"qseqid": str,
+                      "sseqid": str,
+                      "pident": float,
+                      "qcovs": float}
         b_tab = pd.DataFrame(rows, columns=cols).astype(data_types)
         return b_tab

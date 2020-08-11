@@ -1,33 +1,36 @@
+import base64
 import itertools
 import logging
 import re
-import base64
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from natsort import natsorted
 from sqlalchemy import create_engine
+
+from natsort import natsorted
 from yattag import Doc, indent
-from pathlib import Path
 
 
 class HtmlReportGenerator:
     def __init__(self,
                  path_to_report_table,
                  path_to_output_html,
-                 args):
+                 args,
+                 ok_qcovs,
+                 ok_perc_identity):
         self.path_to_report_table = path_to_report_table
         self.path_to_output_html = path_to_output_html
-        self.args = args
+        self.args = args,
+        self.ok_qcovs = ok_qcovs,
+        self.ok_perc_identity = ok_perc_identity,
         self.LOGGER = logging.getLogger(__name__)
         self.LOGGER.setLevel(logging.DEBUG)
-        
-        
+
     def __picture_to_string(self, picture):
-        with open(Path(self.args.out).joinpath(picture), "rb") as imageFile:
+        with open(Path(self.args[0].out).joinpath(picture), "rb") as imageFile:
             pic_str = base64.b64encode(imageFile.read())
             return b"data:image/png;base64," + pic_str
-
 
     def generate_report(self):
         logging.info("report generation")
@@ -50,27 +53,31 @@ class HtmlReportGenerator:
         with tag("h2", klass="run-parameters"):
             text("Run parameters and thresholds:")
             with tag("h4", klass="thresholds"):
-                text(f"E-value threshold: {self.args.evalue}")
+                text(f"Query cover calculated threshold: {self.ok_qcovs[0]}%")
                 doc.stag("br")
-                text(f"Identity percent threshold: {self.args.identity_percent}")
+                text(
+                    f"Percent identity calculated threshold: "
+                    f"{self.ok_perc_identity[0]}%"
+                )
                 doc.stag("br")
-                text(f"Query cover threshold: {self.args.query_cover}")
+                text(
+                    f"Include ribosomal clusters: "
+                    f"{self.args[0].include_ribosomal}"
+                )
                 doc.stag("br")
-                text(f"Include ribosomal clusters: {self.args.include_ribosomal}")
-                doc.stag("br")
-                text(f"Include 'Other' clusters: {self.args.include_other}")
+                text(f"Include 'Other' clusters: {self.args[0].include_other}")
                 doc.stag("br")
         result = indent(doc.getvalue())
         with open(self.path_to_output_html, "w") as output:
             output.write(result)
 
-
         # Identified superclusters
         with tag("h2", klass="identified-header"):
             text("Identified superclusters")
-        all_identified = engine.execute(f"SELECT SuperclusterName \
-            FROM report_table \
-                WHERE SuperclusterType=='identified'").fetchall()
+        all_identified = engine.execute(
+            "SELECT SuperclusterName FROM report_table "
+            "WHERE SuperclusterType=='identified'"
+        ).fetchall()
         all_identified = list(itertools.chain(*all_identified))
         all_identified = natsorted(list(np.unique(all_identified)))
         for scl in all_identified:
@@ -135,9 +142,12 @@ class HtmlReportGenerator:
                                 text(sequence)
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
-                                doc.stag("img",
-                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
-                                        width="120", border=0)
+                                doc.stag(
+                                    "img",
+                                    src=(self.__picture_to_string(scl_info[4]).
+                                         decode("utf-8")),
+                                    width="120", border=0
+                                )
                         with tag("td"):
                             text(scl_info[5])
                         with tag("td"):
@@ -173,9 +183,12 @@ class HtmlReportGenerator:
                                 text(sequence)
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
-                                doc.stag("img",
-                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
-                                        width="120", border=0)
+                                doc.stag(
+                                    "img",
+                                    src=(self.__picture_to_string(scl_info[4]).
+                                         decode("utf-8")),
+                                    width="120", border=0
+                                )
                         with tag("td"):
                             text(scl_info[5])
                         with tag("td"):
@@ -223,9 +236,10 @@ class HtmlReportGenerator:
         # Not identified superclusters
         with tag("h2", klass="not-identified-header"):
             text("Not identified superclusters")
-        not_identified = engine.execute(f"SELECT SuperclusterName \
-            FROM report_table \
-                WHERE SuperclusterType=='not_identified'").fetchall()
+        not_identified = engine.execute(
+            "SELECT SuperclusterName FROM report_table WHERE SuperclusterType="
+            "='not_identified'"
+        ).fetchall()
         not_identified = list(itertools.chain(*not_identified))
         not_identified = natsorted(list(np.unique(not_identified)))
         for scl in not_identified:
@@ -290,9 +304,12 @@ class HtmlReportGenerator:
                                 text(sequence)
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
-                                doc.stag("img",
-                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
-                                        width="120", border=0)
+                                doc.stag(
+                                    "img",
+                                    src=(self.__picture_to_string(scl_info[4]).
+                                         decode("utf-8")),
+                                    width="120", border=0
+                                )
                         with tag("td"):
                             text(scl_info[5])
                         with tag("td"):
@@ -328,9 +345,12 @@ class HtmlReportGenerator:
                                 text(sequence)
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
-                                doc.stag("img",
-                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
-                                        width="120", border=0)
+                                doc.stag(
+                                    "img",
+                                    src=(self.__picture_to_string(scl_info[4]).
+                                         decode("utf-8")),
+                                    width="120", border=0
+                                )
                         with tag("td"):
                             text(scl_info[5])
                         with tag("td"):
@@ -342,10 +362,10 @@ class HtmlReportGenerator:
         # Probable unique superclusters
         with tag("h2", klass="probable-unique-header"):
             text("Probable unique superclusters")
-        probable_unique = engine.execute(f"SELECT SuperclusterName \
-            FROM report_table \
-                WHERE SuperclusterType=='probable_unique' \
-                    AND Features!='Truly unique'").fetchall()
+        probable_unique = engine.execute(
+            "SELECT SuperclusterName FROM report_table WHERE SuperclusterType="
+            "='probable_unique' AND Features!='Truly unique'"
+        ).fetchall()
         probable_unique = list(itertools.chain(*probable_unique))
         probable_unique = natsorted(list(np.unique(probable_unique)))
         for scl in probable_unique:
@@ -410,9 +430,12 @@ class HtmlReportGenerator:
                                 text(sequence)
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
-                                doc.stag("img",
-                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
-                                        width="120", border=0)
+                                doc.stag(
+                                    "img",
+                                    src=(self.__picture_to_string(scl_info[4]).
+                                         decode("utf-8")),
+                                    width="120", border=0
+                                )
                         with tag("td"):
                             text(scl_info[5])
                         with tag("td"):
@@ -448,9 +471,12 @@ class HtmlReportGenerator:
                                 text(sequence)
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
-                                doc.stag("img",
-                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
-                                        width="120", border=0)
+                                doc.stag(
+                                    "img",
+                                    src=(self.__picture_to_string(scl_info[4]).
+                                         decode("utf-8")),
+                                    width="120", border=0
+                                )
                         with tag("td"):
                             text(scl_info[5])
                         with tag("td"):
@@ -462,10 +488,10 @@ class HtmlReportGenerator:
         # truly unique
         with tag("h2", klass="truly-unique-header"):
             text("Truly unique superclusters")
-        truly_unique = engine.execute(f"SELECT SuperclusterName \
-            FROM report_table \
-                WHERE SuperclusterType=='probable_unique' \
-                    AND Features=='Truly unique'").fetchall()
+        truly_unique = engine.execute(
+            "SELECT SuperclusterName FROM report_table WHERE SuperclusterType="
+            "='probable_unique' AND Features=='Truly unique'"
+        ).fetchall()
         truly_unique = list(itertools.chain(*truly_unique))
         truly_unique = natsorted(list(np.unique(truly_unique)))
         with tag("table", klass="probable-unique-table"):
@@ -520,9 +546,12 @@ class HtmlReportGenerator:
                                 text(sequence)
                         with tag("td"):
                             with tag("a", href=scl_info[4]):
-                                doc.stag("img",
-                                        src=self.__picture_to_string(scl_info[4]).decode("utf-8"),
-                                        width="120", border=0)
+                                doc.stag(
+                                    "img",
+                                    src=(self.__picture_to_string(scl_info[4]).
+                                         decode("utf-8")),
+                                    width="120", border=0
+                                )
                         with tag("td"):
                             text(scl_info[5])
                         with tag("td"):
