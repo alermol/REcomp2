@@ -1,6 +1,6 @@
 # REcomp2
 
-Pipeline for comparative analysis potentially unlimited number results of RepeatExplorer runs
+Pipeline for comparative analysis potentially unlimited number of RepeatExplorer runs
 
 ## Description
 
