@@ -311,7 +311,10 @@ report_generator = (
 )
 report_generator.generate_report()
 try:
-    shutil.copyfile(Path.cwd().joinpath("REcomp", "report", "style1.css"),
+    shutil.copyfile(Path.cwd().joinpath("REcomp2",
+                                        "REcomp",
+                                        "report",
+                                        "style1.css"),
                     out_path.joinpath("style1.css"))
 except FileNotFoundError:
     shutil.copyfile(Path.cwd().joinpath("report", "style1.css"),
