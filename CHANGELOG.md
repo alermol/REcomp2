@@ -34,3 +34,9 @@
 * Small changes in report.
 * Minor fixes in code.
 * Code refractoring.
+
+---
+
+## v2.1.2-1
+
+* Test data become more lightweigth
