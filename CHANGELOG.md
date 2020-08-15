@@ -39,4 +39,4 @@
 
 ## v2.1.2-1
 
-* Test data become more lightweigth
+* Test data become more lightweight
