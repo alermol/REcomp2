@@ -2,7 +2,7 @@
 All configuration for REcomp
 """
 
-PIPELINE_VERSION = "2.1.2-1"
+PIPELINE_VERSION = "2.1.2-2"
 
 # default run parameters
 EVALUE = 1e-05

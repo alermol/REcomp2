@@ -40,3 +40,10 @@
 ## v2.1.2-1
 
 * Test data become more lightweight
+
+---
+
+## v2.1.2-2
+
+* Test data become more lightweight
+* Small bugfixes
