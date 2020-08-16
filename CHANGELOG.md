@@ -47,3 +47,10 @@
 
 * Test data become more lightweight
 * Small bugfixes
+
+---
+
+## v2.1.2-3
+
+* Test data become more lightweight
+* Small bugfixes
