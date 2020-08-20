@@ -63,8 +63,8 @@
 * Size of `REcomp2` was decreased
 * `megablast` and `blastn` has been added as options for superclusters identification
 * More accurate 'other' contigs selection algorithm based on artificial similarity index  
-For each contig in superclusters will be calculated `Similarity Index (SI)`:
+For each contig in superclusters will be calculated **Similarity Index** `(SI)`:
 
->                               SI = abs(1 - (N / Q * 100))
+                                     SI = abs(1 - (N / Q * 100))
 
-where N - number of hits for contig with all consensuses in supercluster, Q - maximal query cover per HSP across all HSP of contig. Contig with the smallest `SI` value will be selected.
+    where N - number of hits for contig with all consensuses in supercluster, Q - maximal query cover per HSP across all HSP of contig. Contig with the smallest `SI` value will be selected.
