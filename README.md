@@ -82,7 +82,9 @@ optional arguments:
   --low-memory          use small amount of RAM for 'all to all' blast by using small chunk size (1000)
                         but it can take much time (default chunk size: 10000)
   -ss {blastn,megablast}, -superclusters-search {blastn,megablast}
-                        alignments for union of sequences in supercluster can be performed either blastn or megablast (default): blastn is slower and required more RAM but more sensitive
+                        alignments for union of sequences in supercluster can be performed either  
+                        blastn or megablast (default): blastn is slower and required more RAM
+                        but more sensitive
 ```
 
 The details of each option are given below:
