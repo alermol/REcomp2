@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import tqdm
 from Bio import SeqIO
+from Bio.Blast.Applications import NcbimakeblastdbCommandline
 from sklearn.cluster import AgglomerativeClustering, KMeans
 
 import config
@@ -79,6 +80,16 @@ parser.add_argument("--low-memory",
                           ),
                     action="store_true",
                     dest="low_memory")
+parser.add_argument("-ss", "-superclusters-search",
+                    help=(
+                        "alignments for union of sequences in supercluster "
+                        "can be performed either blastn or megablast (default)"
+                        ": blastn is slower and required more RAM but "
+                        "more sensitive"
+                    ),
+                    choices=["blastn", "megablast"],
+                    default="megablast",
+                    dest="task")
 args = parser.parse_args()
 
 # catch assertions
@@ -86,7 +97,7 @@ assert len(args.p.split()) == len(
     set(args.p.split())), ("Prefixes are not unique")
 assert len(args.i.split()) == len(
     set(args.i.split())), ("Paths are not unique")
-assert 0 < args.cpu_number < cpu_count(), ("CPU count is not valid")
+assert 0 < args.cpu_number <= cpu_count(), ("CPU count is not valid")
 assert args.evalue >= 0.0, ("Wrong E-value thershold")
 
 out_path = Path(args.out)
@@ -169,7 +180,7 @@ chunk_size = config.CHUNK_SIZE
 if args.low_memory:
     chunk_size = config.CHUNK_SIZE / 10
 logging.info(f"chunk size: {int(chunk_size)}")
-time.sleep(5)
+time.sleep(3)
 for i, batch in enumerate(fasta_prep.batch_iterator(record_iter, chunk_size)):
     records_number += len(batch)
     filename = Path(fasta_path).joinpath(f"fasta{i}.fasta")
@@ -178,16 +189,22 @@ for i, batch in enumerate(fasta_prep.batch_iterator(record_iter, chunk_size)):
     logging.info(f"saving chunk {'/'.join(filename.parts[-3:])}")
 
 # prepare connectivity table
+cline = NcbimakeblastdbCommandline(
+    input_file=Path(fasta_path).joinpath("fasta.fasta"),
+    dbtype="nucl"
+)
+cline()
 logging.info("running all to all blast")
-fasta_aligner = FastaAligner(args.evalue)
+fasta_aligner = FastaAligner(args.evalue,
+                             args.task,
+                             Path(fasta_path).joinpath("fasta.fasta"))
 files = [path for path in fasta_path.rglob("*.fasta")
          if any(map(str.isdigit, Path(path).stem))]
-pairs = [list(i) for i in itertools.combinations_with_replacement(files, 2)]
 print(f"Running in {args.cpu_number} cpu(s) in parallel")
-time.sleep(5)
+time.sleep(3)
 pool = Pool(processes=args.cpu_number)
-result = tqdm.tqdm(pool.imap_unordered(fasta_aligner.align_fasta, pairs),
-                   total=len(pairs))
+result = tqdm.tqdm(pool.imap_unordered(fasta_aligner.align_fasta, files),
+                   total=len(files))
 blast_table = pd.concat(result)
 pool.close()
 logging.info("all to all blast finished")
@@ -243,7 +260,7 @@ for pair in blast_table.itertuples(index=False, name=None):
 uf_repr = [int(i) for i in str(quick_union).split()]
 cc_num = set(uf_repr)
 logging.info(f"{len(cc_num)} superclusters detected")
-time.sleep(5)
+time.sleep(3)
 
 
 # create prime fasta with superclusters
@@ -258,7 +275,7 @@ prime_fw = PrimeFastaWriter(fasta_path.joinpath("fasta.fasta"),
                             rev_map_dict,
                             uf_repr)
 print(f"Running in {args.cpu_number} cpu(s) in parallel")
-time.sleep(5)
+time.sleep(3)
 pool = Pool(processes=args.cpu_number)
 for _ in tqdm.tqdm(pool.imap_unordered(prime_fw.write_fasta, cc_num),
                    total=len(cc_num)):
@@ -271,8 +288,10 @@ if args.include_other:
     logging.info(
         "cleaning the primary fasta files from excessive 'other' clusters")
     fasta = [path for path in prime_fasta.rglob("*.fasta")]
-    fasta_finalizer = FastaFinalizer(prime_fasta, final_fasta,
-                                     args.p.split())
+    fasta_finalizer = FastaFinalizer(prime_fasta,
+                                     final_fasta,
+                                     args.p.split(),
+                                     args.task)
     pool = Pool(processes=args.cpu_number)
     pool.map(fasta_finalizer.final_fasta, fasta)
     pool.close()

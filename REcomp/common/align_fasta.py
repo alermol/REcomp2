@@ -5,18 +5,23 @@ from Bio.Blast.Applications import NcbiblastnCommandline
 class FastaAligner:
 
     def __init__(self,
-                 evalue):
+                 evalue,
+                 task,
+                 database):
         self.evalue = evalue
+        self.task = task
+        self.database = database
 
-    def align_fasta(self, pair):
+    def align_fasta(self, fasta):
         """
         Create connectivity table for QU using blast
         """
-        cline = NcbiblastnCommandline(query=pair[0],
-                                      subject=pair[1],
+        cline = NcbiblastnCommandline(query=fasta,
+                                      db=self.database,
                                       out="-",
                                       outfmt="6 qseqid sseqid pident qcovs",
-                                      evalue=self.evalue)
+                                      evalue=self.evalue,
+                                      task=self.task)
         output = cline()[0].strip()
         rows = [line.split() for line in output.splitlines()]
         cols = ["qseqid", "sseqid", "pident", "qcovs"]

@@ -1,8 +1,6 @@
 ### Python ###
 # Byte-compiled / optimized / DLL files
-__pycache__/
-REcomp/common/__pycache__/
-REcomp/report/__pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 
@@ -109,3 +107,4 @@ dmypy.json
 .vscode/
 test_output_io/
 test_output_nio/
+* copy*

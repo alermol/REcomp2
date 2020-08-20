@@ -226,7 +226,7 @@ class ReportTableConstructor:
                                     split("Contig")[0]).group(0)
                 record_id = re.search(r"^[a-zA-Z0-9]+_[a-zA-Z0-9]+",
                                       row[0]).group(0)
-                feature = row[0].split("_")[-1]
+                feature = ""
                 proportion = engine.execute(f"SELECT Proportion \
                     FROM repex_table \
                         WHERE Prefix='{prefix}' \

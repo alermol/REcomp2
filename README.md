@@ -1,6 +1,6 @@
 # REcomp2
 
-Pipeline for comparative analysis potentially unlimited number of RepeatExplorer runs
+Pipeline for comparative analysis of potentially unlimited number of RepeatExplorer runs
 
 ## Description
 
@@ -12,9 +12,9 @@ Main steps of pipeline's work:
 
 2. Spliting FASTA file in chunks for parallel BLAST
 
-3. All to all chunks megaBLAST for building of the connectivity table
+3. All to all chunks BLAST for building of the connectivity table
 
-4. Dropping of junk alignment using K-means or agglomerative clustering
+4. Dropping of junk alignments using K-means or agglomerative clustering
 
 5. Building a graph in memory using QuickUnion algorithm
 
@@ -24,7 +24,7 @@ Main steps of pipeline's work:
 
 8. Writing of selected superclusters in separate FASTA
 
-9. Filtering contigs if necessary using BLASTn
+9. Filtering contigs if necessary using BLAST
 
 10. Report generation with information about each selected supercluster
 
@@ -34,15 +34,12 @@ Install Anaconda with python 3 from [official website](https://www.anaconda.com/
 
 Download and install BLAST+ from [official website](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/). Check the presence of path to installation folder in PATH variable.
 
-Download ZIP-archive
-
-Unzip archive in installation directory
-
 ```bash
-cd REcomp2-master
+git clone https://github.com/alermol/REcomp2.git
+cd REcomp2/
 conda env create -f environment.yaml
 conda activate recomp
-cd REcomp
+cd REcomp/
 ./test.py
 ```
 
@@ -63,7 +60,8 @@ which gives the following output
 
 ```None
 usage: REcomp.py [-h] [-v] [-r REF] [-l] [-c CPU] [-io] [-ir]
-                 [--evalue EVALUE] [--low-memory] path prefix out
+                 [--evalue EVALUE] [--low-memory] [-ss {blastn,megablast}]  
+                 path prefix out
 
 positional arguments:
   path                  path(s) to RE results (top level)
@@ -83,6 +81,8 @@ optional arguments:
   --evalue EVALUE       evalue threshold for alignments for supercluster assembly (default: 1e-05)
   --low-memory          use small amount of RAM for 'all to all' blast by using small chunk size (1000)
                         but it can take much time (default chunk size: 10000)
+-ss {blastn,megablast}, -superclusters-search {blastn,megablast}
+                        alignments for union of sequences in supercluster can be performed either blastn or megablast (default): blastn is slower and required more RAM but more sensitive
 ```
 
 The details of each option are given below:
@@ -119,7 +119,7 @@ File containing references in FASTA format. Files with multiple sequences are al
 
 **Expects**: *None*  
 **Default**: *False*  
-If this argument in set `logfile.log` will be saved in output directory.
+If this argument in set `REcomp.log` will be saved in output directory.
 
 ### `-c`
 
@@ -150,6 +150,12 @@ E-value threshold for BLAST alignment. Alignments with E-value greater than this
 **Expects**: *None*  
 **Default**: *False*  
 If this parameters in set, fasta file will be splitted in chunk with less size. This allow to use less amount of memory during 'all to all blast' step.
+
+### `-ss or --superclusters-search`
+
+**Expect**: *STRING (blast or megablast)*  
+**Defailt**: *megablast*  
+Alignments for union of sequences in superclusters can be performed either `blastn` or `megablast`. `blastn` is slower and required more RAM but more sensitive.
 
 ### `-v or --version`
 
